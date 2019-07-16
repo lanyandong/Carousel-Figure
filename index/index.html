@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="https://cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
+    <title>雷暴天气预测展示页面-比赛设计</title>
+
+    <style>
+
+        /*页面整体*/
+         /*标题头*/
+        .header {
+            background-color: #F1F1F1;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .mainContent{
+            width:100%;
+            float:left;
+            background:rgb(195, 218, 241)
+        }
+
+        /**内容主题分为两列*/
+        /* Left column */
+        .leftcolumn {   
+            float: left;
+            width: 40%;
+        }
+            
+        /* 右侧栏 */
+        .rightcolumn {
+            float: left;
+            width: 60%;
+
+        }
+
+        .treebox{ 
+            width: 300px; 
+            margin: 0px auto; 
+            background-color:#043567;; 
+        }
+
+        .menu{ 
+            color:#fff; 
+            border-width: 1px;
+            font-size: 20px; 
+        }
+
+        .button{ 
+            width: 300px;
+            height: 50px; 
+            font-size: 25px;  
+        }
+
+        .button1{ 
+            margin-top: 25px;
+            width: 300px;
+            height: 50px;
+            font-size: 25px;
+            background:#f29143; 
+            color:#fff;
+        }
+
+        /*右侧栏内容//padding:23px 0 0 0*/
+        .rightContent{
+            width:70%;
+            float:left;
+            position:relative;
+            border: #043567 solid;
+            border-width: 2px;
+            
+        }
+
+        /*显示图片元素*/
+        .picContent{
+            width:100%;
+            height:auto
+        }
+        .picContent img{
+            width:100%;
+            height:550px;
+            display:none
+        }
+
+        .picContent .showImg{
+            display:block
+        }
+
+        /*控制台栏*/
+        .playContent{
+            width:100%;
+            height:80px;
+            background:#043567;
+            line-height:80px
+        }
+
+
+        /*按钮*/
+        .playContent .btnDiv{
+            width:50px;
+            height: 50px;
+            float:left;
+            margin-right:10px
+        }
+
+        /*开始*/
+        .playContent .playBtn{
+            margin-top:25px;
+            margin-left:10px;
+            height:30px;
+            width:30px;
+            background-position:-85px 0
+        }
+
+        /*停止*/
+        .playContent .stopBtn{
+            margin-top:25px;
+            margin-left:10px;
+            height:30px;
+            width:30px;
+            background-position:-57px 0
+        }
+
+        /*播放键background-image:url(http://i.tq121.com.cn/i/product_2016/imgBtns.png); 图标*/
+        .imgBtns{
+            background-image:url(./css/imgBtns.png);
+            background-repeat:no-repeat
+        }
+
+        /*播放时的按钮不单独显示*/
+        .dis{
+            display:none
+        }
+
+        /*信息显示*/
+        .playContent .infoDiv{
+            height:36px;
+            float:left;
+            color:#fff;
+            margin-right:10px;
+            font-size:18px
+        }
+
+        /*margin 外边距，padding 内边距*/
+        /*三个长方形按钮*/
+        .playContent .playBar a{
+            height:8px;
+            float:left;
+            margin-top:36px;
+            background:#f29143;
+            cursor:pointer
+        }
+
+        /*鼠标移动到按钮上的时候为白色*/
+        .playContent .playBar a:hover{
+            background: #fff;
+        }
+
+        /*!important 优先级*/
+        .playContent .playBar .cur{
+            background:#fff;
+        }
+
+        /*!缓加载项目*/
+        .playContent .playBar03 a{
+            margin-right:4px;
+            width:40px
+        }
+
+
+        /* 底部 */
+        .footer {
+            background:  rgb(199, 194, 194);
+            text-align: center;
+            padding: 10px;
+            line-height: 30px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+        <div class="header">
+				<h1>强对流天气雷暴中心AI预测系统</h1>
+        </div>
+
+        <div class="mainContent"> 
+        <div class="leftcolumn">
+        <div class="treebox">
+                <div class="menu">
+                    <button id = 'nweather' class="button">天气实况</button>
+                    <ul class="level1">
+                        <li>风速</li>
+                        <li id = 'nwind'></li>
+                        <li>雷暴中心</li>
+                        <li id = 'nlocal'></li>
+                    </ul>
+                </div>
+
+
+                <div class="menu">
+                        <button id = 'pweather' class="button">数值预测</button>
+                        <ul class="level1">
+                                <li>风速</li>
+                                <li id = 'pwind'></li>
+                                <li>雷暴中心</li>
+                                <li id = 'plocal'></li>
+                        </ul>
+                </div>
+                <button id ="loadBtn" class="button1">点击加载图片</button>
+        </div>
+        
+        </div>
+
+        <script>
+                document.querySelector('button[id = nweather]').onclick = function(){
+        
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('post', 'getData.php');
+                    xhr.onreadystatechange = function(){
+                        if(xhr.readyState == 4 && xhr.status == 200){
+                            console.log(xhr.responseText);
+
+                            var obj = JSON.parse(xhr.responseText);
+                            //console.log(obj);
+                            //console.log(obj.weatherinfo.realtime);
+                            
+                            var wind =  obj.weatherinfo.realtime.wind;
+							var location = obj.weatherinfo.realtime.location;
+                            document.querySelector('li[id = nwind]').innerHTML = wind;
+                            document.querySelector('li[id = nlocal]').innerHTML = "经纬度：(" + location.longitude + ", " + location.latitude + ")";
+                        }
+                    }
+                    xhr.send();
+                }
+        </script>
+        <script>
+                document.querySelector('button[id = pweather]').onclick = function(){
+        
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('post', 'getData.php');
+                    xhr.onreadystatechange = function(){
+                        if(xhr.readyState == 4 && xhr.status == 200){
+                            console.log(xhr.responseText);
+
+                            var obj = JSON.parse(xhr.responseText);
+                            //console.log(obj);
+                            //console.log(obj.weatherinfo.future);
+                            var wind =  obj.weatherinfo.future.wind;
+							var location = obj.weatherinfo.future.location;
+                            document.querySelector('li[id = pwind]').innerHTML = wind;
+                            document.querySelector('li[id = plocal]').innerHTML = "经纬度：(" + location.longitude + ", " + location.latitude + ")";
+                        }
+                    }
+                    xhr.send();
+                }
+        </script>
+
+        <!--ahfsHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH start -->
+        <!--ahfsHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH start -->
+        <!--ahfsHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH start -->
+        <!--ahfsHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH start -->
+
+        <div class="rightcolumn">
+        
+        <!-- <button id ="loadBtn" class="button">点击加载图片</button> -->
+        <div class="rightContent">
+                <!-- 雷达图展示 start 预加载5张图-->
+                <div class="picContent">
+                    <a href="./data/img/test/Test_Pic_0.png" target="_blank">
+                        <img src="./data/img/test/Test_Pic_0.png" class="showImg" ></a>
+                    <a href="./data/img/test/Test_Pic_1.png" target="_blank">
+                        <img src="./data/img/test/Test_Pic_1.png" ></a>
+                    <a href="./data/img/test/Test_Pic_2.png" target="_blank">
+                        <img src="./data/img/test/Test_Pic_2.png" ></a>
+                    <a href="./data/img/test/Test_Pic_3.png" target="_blank">
+                        <img src="./data/img/test/Test_Pic_3.png" ></a>
+                    <a href="./data/img/test/Test_Pic_4.png" target="_blank">
+                        <img src="./data/img/test/Test_Pic_4.png" ></a>
+                    <a href="./data/img/test/Test_Pic_5.png" target="_blank">
+                        <img src="./data/img/test/Test_Pic_5.png" ></a>
+                </div>
+                <!-- 雷达图展示 end-->
+
+                <!-- 控制台 begin-->
+                <div class="playContent">
+
+                    <div class="btnDiv imgBtns playBtn" id="playBtn"></div>
+                    <div class="btnDiv imgBtns stopBtn dis"></div>
+
+                    <div class="playBar playBar03">
+                        <div class="infoDiv " style="width:68px;text-align:center;">now</div>
+                        <!-- 控制台按钮 -->
+                        <div id="btn_group" style="overflow:hidden">
+                            <a class="cur" data-type="0"></a>
+                            <a data-type="1"></a>
+                            <a data-type="2"></a>
+                            <a data-type="3"></a>
+                            <a data-type="4"></a>
+                            <a data-type="5"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 右边内容部分 end -->
+        </div>
+
+    
+    
+    <!--实现轮播功能 jQuery-->
+    <script>
+        // js 获取css 属性(id,或者)
+        var ELE = {
+            img: $(".picContent a img"),
+            btn_choose: $("#btn_group a"),
+            btn_play: $("#playBtn"),
+            info: $(".infoDiv")
+        };
+        // 定义变量
+        var TIMEMSG = ['now', '6min', '12min', '18min', '24min','30min'];
+        var SETTIME = 1000;
+        var PLAY = false;
+        function swiper(num) {
+            //1变换图片
+            //2变换按钮
+            //3改变文字
+            ELE.img.removeClass('showImg');
+            ELE.img.eq(num).addClass('showImg');
+
+            ELE.btn_choose.removeClass('cur');
+            ELE.btn_choose.eq(num).addClass('cur');
+
+            ELE.info.html(TIMEMSG[num]);
+        }
+
+        // 播放
+        function play(num) {
+            var n = num;
+            var t = SETTIME;
+            PLAY = true;
+            // 调用函数
+            swiper(n);
+            n++;
+
+            // 设置图片数目，判断是否播放完，回到开始
+            if (n >= 6) {
+                setTimeout(function() {
+                    swiper(0);
+                    ELE.btn_play.removeClass('stopBtn').addClass('playBtn');
+                    PLAY = false;
+                    console.log(PLAY)
+                }, t)
+                return
+            }
+
+            // 设置时间延迟
+            setTimeout(function() {
+                play(n);
+            }, t)
+        }
+
+        //事件触发，btn_choose
+        ELE.btn_choose.on("click", function(e) {
+            if (!PLAY) {
+                var num = $(this).attr('data-type');
+                swiper(num);
+            }
+        });
+
+        //事件触发，btn_choose
+        ELE.btn_play.on("click", function(e) {
+            if (!PLAY) {
+                $(this).removeClass('playBtn').addClass('stopBtn');
+                play(0);
+            }
+        });          
+    </script>
+
+     <script>
+            //实时图片加载
+            $(function(){
+                // 按钮触发
+                $("#loadBtn").click(function(){
+                    //获取点击后新的图片地址
+                    var newSrc = [];
+                    $(".picContent a").each(function(){
+                        //获取点击后新的图片地址
+                        var index = $(this).index();
+                        newSrc.push('./data/img/pre/Pre_Pic_' + index + '.png');//存放图片原地址
+                    });
+    
+                    //更新地址
+                    $(".picContent a").siblings().each(function(){
+                        var index = $(this).index();
+                        $(this).find("img").attr("src",newSrc[index]);
+                    });
+                    return false;
+                });
+            })
+        </script>
+     <!--主体内容结束-->
+    </div>
+
+   <div class = "footer">
+    <p>Copyright©2019</p>
+   </div>
+
+</body>
+</html>
+
+
+

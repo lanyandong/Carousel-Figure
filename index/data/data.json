@@ -1,0 +1,21 @@
+{"weatherinfo":{"city":"重庆",
+				"realtime": {
+					"wind": "18级",
+					"location":{
+						"longitude":"29.42",
+						"latitude": "107.05 "
+					},
+					"direct": "西北风"
+				},
+				"future": {
+					"wind": "18级",
+					"location":{
+						"longitude":"29.44",
+						"latitude": "107.06"
+					
+					},
+					"direct": "西北风"
+				}
+				}
+}
+
